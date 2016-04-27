@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="@dimen/list_item_general_height"
+    app:rv_centered="true">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/listitem_general_rlt_cb"
+        android:layout_marginLeft="10dp"
+        android:visibility="gone">
+
+        <CheckBox
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/listitem_general_cb"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="8"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="@dimen/list_item_general_tv_margin_left"
+                android:layout_marginBottom="@dimen/list_item_general_inter_tv_margin"
+                android:textSize="@dimen/list_item_general_top_textsize"
+                android:textColor="@color/textcolor_dark_grey"
+                android:id="@+id/listitem_general_tv_heading"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="@dimen/list_item_general_tv_margin_left"
+                android:layout_marginTop="@dimen/list_item_general_inter_tv_margin"
+                android:textSize="@dimen/list_item_general_bottom_textsize"
+                android:textColor="@color/textcolor_light_grey"
+                android:id="@+id/listitem_general_tv_subheading"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!--<RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="@dimen/list_item_right_arrow_size"
+            android:layout_height="@dimen/list_item_right_arrow_size"
+            android:src="@drawable/right_arrow_gray"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"/>
+
+    </RelativeLayout>-->
+
+
+</LinearLayout>

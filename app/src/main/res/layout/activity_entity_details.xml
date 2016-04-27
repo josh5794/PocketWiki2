@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@android:color/white"
+    tools:context=".Activities.EntityDetailsActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/theme_splash_activity_style.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/theme_splash_activity_style.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_entity_details" />
+
+    <!--<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/entitydetails_bottom_bar_height"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="@dimen/entitydetails_bottom_bar_margin_bottom">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/entitydetailsactivity_rlt_dwnload"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="@dimen/entitydetails_bottom_bar_icon_size"
+                android:layout_height="@dimen/entitydetails_bottom_bar_icon_size"
+                android:layout_centerInParent="true"
+                android:src="@drawable/btn_dwnload"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/entitydetailsactivity_rlt_audio"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="@dimen/entitydetails_bottom_bar_icon_size"
+                android:layout_height="@dimen/entitydetails_bottom_bar_icon_size"
+                android:layout_centerInParent="true"
+                android:src="@drawable/btn_audio"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/entitydetails_bottom_bar_height"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/entitydetails_bottom_bar_topMargin"
+        android:layout_gravity="bottom">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/entitydetailsactivity_rlt_dwnload"
+            android:background="@drawable/filter_button_background"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="@dimen/btn_download_textsize"
+                android:gravity="center"
+                android:text="@string/btn_text_download"
+                android:textColor="@android:color/white"
+                android:layout_centerInParent="true"
+                android:id="@+id/entitydetailsactivity_tv_download" />
+
+        </RelativeLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"/>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/entitydetailsactivity_rlt_audio"
+            android:background="@drawable/filter_button_background"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/btn_play_textsize"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="@string/btn_text_play"
+                android:textColor="@android:color/white"
+                android:layout_centerInParent="true"
+                android:id="@+id/entitydetailsactivity_tv_play" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/entitydetailsactivity_btn_explore_subentities"
+        android:text="@string/btn_text_explore_subentities"
+        android:textColor="@android:color/white"
+        android:layout_gravity="bottom"
+        android:background="@color/purple_primary"
+        android:visibility="gone"/>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_fragment_height">
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:dividerHeight="@dimen/list_item_divider_height"
+        android:divider="@color/list_divider_color_light_grey"
+        android:headerDividersEnabled="true"
+        android:id="@+id/generallistfragment_lv"/>
+</LinearLayout>

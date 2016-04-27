@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">PocketWiki</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="app_tagline">your offline wikipedia...</string>
+
+    <string name="title_explore">Explore</string>
+    <string name="title_filter">Filter</string>
+    <string name="suffix_entities">Entities</string>
+    <string name="suffix_single_entity">Entity</string>
+
+    <string name="list_header_select_city">SELECT CITY</string>
+    <string name="list_header_select_category">SELECT CATEGORY</string>
+    <string name="list_header_sub_entities">SUB ENTITIES</string>
+    <string name="download_details_entity">Download details</string>
+
+    <string name="btn_text_apply">APPLY</string>
+    <string name="btn_text_explore_subentities">Explore Subentities</string>
+    <string name="btn_text_download">Download</string>
+    <string name="btn_text_downloaded">Downloaded</string>
+    <string name="btn_text_play">Play</string>
+    <string name="btn_text_stop">Stop</string>
+
+    <string name="tab_text_offline">OFFLINE</string>
+    <string name="tab_text_online">ONLINE</string>
+
+    <string name="title_activity_filter">FilterActivity</string>
+    <string name="title_activity_city_category_selection">City and Category Selection</string>
+    <string name="title_activity_entity_details">Entity Details</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_area_selection">Area Selection</string>
+    <string name="title_activity_entity_selection">Entities</string>
+    <string name="title_activity_subentity_selection">Subentities</string>
+
+    <string name="toast_no_internet">Sorry. You are not connected to the internet</string>
+    <string name="toast_select_city_category">Please select city and category both</string>
+    <string name="toast_go_online">Please go online to fetch content</string>
+    <string name="toast_downloading">Downloading</string>
+    <string name="toast_no_data">No data to show</string>
+    <string name="toast_callback_failure">Callback failure</string>
+    <string name="toast_error">Something went wrong</string>
+    <string name="toast_json_exception">Exception in encoding</string>
+
+    <string name="dialog_fetch_data">Fetching data..</string>
+    <string name="dialog_loading">Loading..</string>
+
+    <array name="alphabets_english">
+        <item><u>A</u></item>
+        <item><u>B</u></item>
+        <item><u>C</u></item>
+        <item><u>D</u></item>
+        <item><u>E</u></item>
+        <item><u>F</u></item>
+        <item><u>G</u></item>
+        <item><u>H</u></item>
+        <item><u>I</u></item>
+        <item><u>J</u></item>
+        <item><u>K</u></item>
+        <item><u>L</u></item>
+        <item><u>M</u></item>
+        <item><u>N</u></item>
+        <item><u>O</u></item>
+        <item><u>P</u></item>
+        <item><u>Q</u></item>
+        <item><u>R</u></item>
+        <item><u>S</u></item>
+        <item><u>T</u></item>
+        <item><u>U</u></item>
+        <item><u>V</u></item>
+        <item><u>W</u></item>
+        <item><u>X</u></item>
+        <item><u>Y</u></item>
+        <item><u>Z</u></item>
+    </array>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_header_height"
+    android:background="@android:color/white">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/list_header_left_margin"
+        android:textSize="@dimen/list_header_textsize"
+        android:textStyle="bold"
+        android:textColor="@color/textcolor_list_header"
+        android:background="@android:color/white"
+        android:id="@+id/listheader_tv"/>
+    <!--<View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_divider_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/list_divider_color_light_grey"/>-->
+    <RelativeLayout
+        android:layout_width="@dimen/list_header_height"
+        android:layout_height="@dimen/list_header_height"
+        android:id="@+id/listheader_rlt_arrow"
+        android:layout_alignParentRight="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="@dimen/list_item_right_arrow_size"
+            android:layout_height="@dimen/list_item_right_arrow_size"
+            android:layout_centerInParent="true"
+            android:src="@drawable/right_arrow_gray"
+            android:id="@+id/listheader_iv_arrow"
+            android:scaleType="fitXY"/>
+
+    </RelativeLayout>
+</RelativeLayout>

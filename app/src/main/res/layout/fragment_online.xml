@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:id="@+id/fragmentonline_parentView"
+    tools:context=".Fragments.OfflineFragment">
+    
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragmentonline_scrView"
+        android:scrollbars="none">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/fragmentonline_llt_city">
+
+                <include layout="@layout/list_city_category_header"
+                    android:id="@+id/fragmentonline_header1"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/list_item_divider_height"
+                    android:background="@color/list_divider_color_light_grey"
+                    android:id="@+id/fragmentonline_divider1" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragmentonline_rlt_city_list">
+                    <com.astuetz.PagerSlidingTabStrip
+                        android:id="@+id/fragmentonline_tabs1"
+                        app:pstsShouldExpand="true"
+                        app:pstsDividerPadding="20dp"
+                        app:pstsTextAllCaps="true"
+                        app:pstsUnderlineColor="@android:color/transparent"
+                        app:pstsIndicatorColor="#979797"
+                        app:pstsTabPaddingLeftRight="11dp"
+                        app:pstsTabBackground="@drawable/alphabet_tab_background"
+                        android:textColor="#ff7043"
+                        android:textSize="18sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_alignParentTop="true"/>
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/fragmentonline_viewpager1"
+                        android:layout_below="@+id/fragmentonline_tabs1"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/list_fragment_height"
+                        android:background="@android:color/white" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/fragmentonline_llt_city"
+                android:id="@+id/fragmentonline_llt_category">
+
+                <include layout="@layout/list_city_category_header"
+                    android:id="@+id/fragmentonline_header2" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/list_item_divider_height"
+                    android:background="@color/list_divider_color_light_grey"
+                    android:id="@+id/fragmentonline_divider2"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragmentonline_rlt_category_list">
+                    <com.astuetz.PagerSlidingTabStrip
+                        android:id="@+id/fragmentonline_tabs2"
+                        app:pstsShouldExpand="true"
+                        app:pstsDividerPadding="20dp"
+                        app:pstsTextAllCaps="true"
+                        app:pstsUnderlineColor="@android:color/transparent"
+                        app:pstsIndicatorColor="#979797"
+                        app:pstsTabPaddingLeftRight="12dp"
+                        app:pstsTabBackground="@drawable/alphabet_tab_background"
+                        android:textColor="#ff7043"
+                        android:textSize="18sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_alignParentTop="true"/>
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/fragmentonline_viewpager2"
+                        android:layout_below="@+id/fragmentonline_tabs2"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/list_fragment_height"
+                        android:background="@android:color/white" />
+                </RelativeLayout>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
