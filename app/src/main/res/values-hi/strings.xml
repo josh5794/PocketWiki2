@@ -23,12 +23,25 @@
     <string name="tab_text_online">ऑनलाइन</string>
 
     <string name="title_activity_filter">FilterActivity</string>
-    <string name="title_activity_city_category_selection">City and Category Selection</string>
-    <string name="title_activity_entity_details">EntityDetailsActivity</string>
+    <string name="title_activity_city_category_selection">शहर और श्रेणी चयन</string>
+    <string name="title_activity_entity_details">संस्था की जानकारी</string>
     <string name="title_activity_splash">SplashActivity</string>
-    <string name="title_activity_area_selection">Area Selection</string>
-    <string name="title_activity_entity_selection">Entities</string>
+    <string name="title_activity_area_selection">क्षेत्र चयन</string>
+    <string name="title_activity_entity_selection">संस्थानों की सूची</string>
+    <string name="title_activity_subentity_selection">उपसंस्थाओं की सूची</string>
 
+    <string name="toast_no_internet">माफ़ कीजिये। आप इंटरनेट से कनेक्ट नहीं कर रहे हैं</string>
+    <string name="toast_select_city_category">कृपया शहर और वर्ग दोनों का चयन</string>
+    <string name="toast_go_online">कृपया अधिक जानकारी के लिए ऑनलाइन जाएँे</string>
+    <string name="toast_downloading">डाउनलोडिंग</string>
+    <string name="toast_no_data">कोई जानकारी दिखाने के लिए नहीं</string>
+    <string name="toast_callback_failure">कॉलबैक विफलता</string>
+    <string name="toast_error">कुछ गलत हो गया</string>
+    <string name="toast_json_exception">एन्कोडिंग में अपवाद</string>
+    <string name="toast_no_gps">हम स्थान के बिना पास के संस्थाओं नहीं दिखा सकते हैं</string>
+
+    <string name="dialog_fetch_data">कृपया इंतजार करें...</string>
+    <string name="dialog_loading">लोड हो रहा है...</string>
 
     <array name="alphabets_english">
         <item>
@@ -110,4 +123,11 @@
             <u>Z</u>
         </item>
     </array>
+
+    <string name="menu_change_language">भाषा बदलें</string>
+    <string name="menu_explore_subentities">उपसंस्थाओं के बारे में जाने</string>
+    <string name="menu_select_all">सभी का चयन करे</string>
+    <string name="menu_download_all">सभी डाउनलोड करे</string>
+    <string name="menu_entities_around">आपके पास के संस्थान</string>
+
 </resources>

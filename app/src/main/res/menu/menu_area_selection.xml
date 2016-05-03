@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/action_explore_subentities"
-        android:title="@string/menu_explore_subentities"
+    <item android:id="@+id/action_select_area"
+        android:title="@string/menu_select_all"
         android:showAsAction="always"/>
 
 </menu>

@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ import pocketwiki.pocketwiki.com.pocketwiki2.Dao.AreaEntities;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.AreaEntitiesDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CategoryEntities;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CategoryEntitiesDao;
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Content;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.ContentDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.DaoSession;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Entity;
@@ -160,10 +162,17 @@ public class EntitySelectionActivity extends AppCompatActivity {
     }
 
     private void setupEntityList(){
-        entityAndAreaInfoList = fetchEntityAndAreaInfo();
+        if(!getIntent().hasExtra(Config.KEY_FOR_NEARBY_ENTITIES)){
+            entityAndAreaInfoList = fetchEntityAndAreaInfo();
+        }
         setContentExists();
         EntityListAdapter listAdapter = new EntityListAdapter(entityAndAreaInfoList, this);
         listView.setAdapter(listAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
     }
 
     private List<EntityAndAreaInfo> fetchEntityAndAreaInfo(){
@@ -249,10 +258,26 @@ public class EntitySelectionActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(s).getJSONObject(Config.KEY_DATA);
                     JSONArray jsonArray = jsonObject.getJSONArray(Config.KEY_ENTITIES);
-                    for(int i=0; i<jsonArray.length();i++){
-                        entityDao.insertOrReplace(extractEntity(jsonArray.getJSONObject(i)));
-                        areaEntitiesDao.insertOrReplace(extractAreaEntity(jsonArray.getJSONObject(i)));
-                        categoryEntitiesDao.insertOrReplace(extractCategoryEntity(jsonArray.getJSONObject(i)));
+                    if(getIntent().hasExtra(Config.KEY_FOR_NEARBY_ENTITIES)){
+                        entityAndAreaInfoList = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            EntityAndAreaInfo entityAndAreaInfo = new EntityAndAreaInfo();
+                            entityAndAreaInfo.setEntityName(jsonArray.getJSONObject(i).getString(Config.KEY_ENTITY_NAME));
+                            entityAndAreaInfo.setAreaName(jsonArray.getJSONObject(i).getString(Config.KEY_AREA));
+                            entityAndAreaInfo.setCityName(jsonArray.getJSONObject(i).getString(Config.KEY_CITY));
+                            entityAndAreaInfo.setContentExists(false);
+                            entityAndAreaInfo.setAreaEntityId(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_AREA_ENTITY_OBJECT).getLong(Config.KEY_ID));
+                            entityAndAreaInfo.setEntityId(jsonArray.getJSONObject(i).getLong(Config.KEY_ID));
+                            entityAndAreaInfo.setThumbURLOnline(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB));
+                            entityAndAreaInfoList.add(entityAndAreaInfo);
+                        }
+                    }
+                    else {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            entityDao.insertOrReplace(extractEntity(jsonArray.getJSONObject(i)));
+                            areaEntitiesDao.insertOrReplace(extractAreaEntity(jsonArray.getJSONObject(i)));
+                            categoryEntitiesDao.insertOrReplace(extractCategoryEntity(jsonArray.getJSONObject(i)));
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -273,8 +298,14 @@ public class EntitySelectionActivity extends AppCompatActivity {
         };
         APICaller apiCaller = new APICaller();
         dialog = Utils.showDialog(EntitySelectionActivity.this,getResources().getString(R.string.dialog_fetch_data));
-        apiCaller.getCall(Config.URL_GET_ENTITIES(Config.AreaIDHolder,Config.CategoryIDHolder),
-                callback,EntitySelectionActivity.this);
+        if(getIntent().hasExtra(Config.KEY_FOR_NEARBY_ENTITIES)){
+            apiCaller.getCall(Config.URL_GET_NEARBY_ENTITIES(getIntent().getStringExtra(Config.KEY_FOR_NEARBY_ENTITIES)),
+                    callback,EntitySelectionActivity.this);
+        }
+        else {
+            apiCaller.getCall(Config.URL_GET_ENTITIES(Config.AreaIDHolder, Config.CategoryIDHolder),
+                    callback, EntitySelectionActivity.this);
+        }
     }
 
     private CategoryEntities extractCategoryEntity(JSONObject jsonObject){
@@ -330,12 +361,72 @@ public class EntitySelectionActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_download_all:
+                downloadAllEntities();
+                return true;
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 this.finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void downloadAllEntities(){
+        DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
+        final ContentDao contentDao = daoSession.getContentDao();
+        Callback <String> callback = new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                Log.i(TAG,"response is " + s);
+                Content content = new Content();
+                try {
+                    JSONObject jsonObject = new JSONObject(s).
+                            getJSONObject(Config.KEY_DATA).getJSONObject(Config.KEY_CONTENT);
+                    content = new Content();
+                    content.setLanguageId((long) 0);
+                    content.setContentId(jsonObject.getLong(Config.KEY_ID));
+                    content.setAreaEntitiesId(jsonObject.getLong(Config.KEY_AREA_ENTITY_ID));
+                    content.setCreatedAt(jsonObject.getString(Config.KEY_CREATED_AT));
+                    content.setUpdatedAt(jsonObject.getString(Config.KEY_UPDATED_AT));
+                    content.setDescription(jsonObject.getString(Config.KEY_DESCRIPTION));
+                    if(!jsonObject.isNull(Config.KEY_SUB_ENTITY_ID))
+                        content.setSubEntityId(jsonObject.getLong(Config.KEY_SUB_ENTITY_ID));
+                    String audioURL = jsonObject.getString(Config.KEY_AUDIO);
+                    String audioFileName = String.valueOf(System.currentTimeMillis());
+                    new DownLoadFileFromURL(EntitySelectionActivity.this,Config.DATA_TYPE_AUDIO).execute(audioURL,
+                            audioFileName);
+                    String filepath = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS + "/" + Config.DOWNLOAD_FOLDER_NAME), audioFileName)).toString();
+                    content.setAudioPath(filepath);
+                    contentDao.insertOrReplace(content);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(EntitySelectionActivity.this,getResources().getString(R.string.toast_json_exception),Toast.LENGTH_SHORT).show();
+                }
+                Utils.dismissDialog(EntitySelectionActivity.this,dialog);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Log.i(TAG,"Something went wrong");
+                Toast.makeText(EntitySelectionActivity.this,getResources().getString(R.string.toast_callback_failure),Toast.LENGTH_SHORT).show();
+                Log.e(TAG,retrofitError.getMessage() + " hmm");
+                Utils.dismissDialog(EntitySelectionActivity.this,dialog);
+            }
+        };
+
+        APICaller apiCaller = new APICaller();
+        dialog = Utils.showDialog(this,getResources().getString(R.string.dialog_fetch_data));
+        Long entityId = getIntent().getLongExtra(Config.KEY_ENTITY_ID,0);
+        if(getIntent().hasExtra(Config.KEY_SUB_ENTITY_ID)){
+            Long subEntityId = getIntent().getLongExtra(Config.KEY_SUB_ENTITY_ID,0);
+            apiCaller.getCall(Config.URL_GET_CONTENT(Config.DEFAULT_LANGUAGE_ID,entityId,subEntityId),callback,this);
+        }
+        else {
+            apiCaller.getCall(Config.URL_GET_CONTENT(Config.DEFAULT_LANGUAGE_ID, entityId), callback, this);
         }
     }
 

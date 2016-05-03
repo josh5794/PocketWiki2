@@ -189,7 +189,7 @@ public class Utils {
                 }
             }
         }
-        Log.i(TAG,String.valueOf(list.size()));
+        //Log.i(TAG,String.valueOf(list.size()));
         return list.toArray(new String[list.size()]);
     }
 

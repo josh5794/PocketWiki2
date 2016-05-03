@@ -12,6 +12,9 @@ public class EntityAndAreaInfo {
     private String cityName;
     private String thumbURL;
 
+    public EntityAndAreaInfo() {
+    }
+
     public String getThumbURL() {
         return thumbURL;
     }

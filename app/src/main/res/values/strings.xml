@@ -43,6 +43,7 @@
     <string name="toast_callback_failure">Callback failure</string>
     <string name="toast_error">Something went wrong</string>
     <string name="toast_json_exception">Exception in encoding</string>
+    <string name="toast_no_gps">Cannot display nearby entities without location</string>
 
     <string name="dialog_fetch_data">Fetching data..</string>
     <string name="dialog_loading">Loading..</string>
@@ -75,4 +76,11 @@
         <item><u>Y</u></item>
         <item><u>Z</u></item>
     </array>
+
+    <string name="menu_change_language">Change Language</string>
+    <string name="menu_explore_subentities">Explore Subentites</string>
+    <string name="menu_select_all">Select All</string>
+    <string name="menu_download_all">Download All</string>
+    <string name="menu_entities_around">Entities around you</string>
+
 </resources>

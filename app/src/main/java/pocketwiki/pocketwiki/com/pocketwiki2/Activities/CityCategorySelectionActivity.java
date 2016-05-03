@@ -1,12 +1,22 @@
 package pocketwiki.pocketwiki.com.pocketwiki2.Activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,12 +33,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.ResultCallbacks;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Category;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CategoryDao;
@@ -46,7 +72,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class CityCategorySelectionActivity extends AppCompatActivity {
+public class CityCategorySelectionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, LocationListener {
 
     private String TAG = getClass().getSimpleName();
     private Toolbar toolbar;
@@ -54,6 +80,12 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
     private ViewPager viewPager;
     FloatingActionButton btnApply;
     private boolean citiesFetched = false, categoriesFetched = false;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mCurrentLocation;
+    private LocationRequest mLocationRequest;
+    private int REQUEST_CHECK_SETTINGS = 0;
+    private String currentArea = "";
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,44 +95,49 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setTitle(getResources().getString(R.string.title_activity_city_category_selection));
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        if(getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED)){
+        if (getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED) || Utils.isOnline(this)) {
             Config.OPERATION_MODE = Config.MODE_ONLINE;
             tabLayout.getTabAt(1).select();
+            if(!getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED)){
+                fetchCitiesAndCategories();
+            }
         }
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                Log.e(TAG,"pos is " + String.valueOf(tab.getPosition()));
-                if(tab.getPosition() == 1 && !Utils.isOnline(CityCategorySelectionActivity.this)){
+                Log.e(TAG, "pos is " + String.valueOf(tab.getPosition()));
+                if (tab.getPosition() == 1 && !Utils.isOnline(CityCategorySelectionActivity.this)) {
                     Toast.makeText(CityCategorySelectionActivity.this,
-                            getResources().getString(R.string.toast_no_internet),Toast.LENGTH_SHORT).show();
+                            getResources().getString(R.string.toast_no_internet), Toast.LENGTH_SHORT).show();
                     Config.OPERATION_MODE = Config.MODE_OFFLINE;
                     new Handler().postDelayed(
-                            new Runnable(){
+                            new Runnable() {
                                 @Override
                                 public void run() {
                                     tabLayout.getTabAt(0).select();
                                 }
                             }, 100);
                 }
-                if(tab.getPosition() == 1 && Utils.isOnline(CityCategorySelectionActivity.this) ){
+                if (tab.getPosition() == 1 && Utils.isOnline(CityCategorySelectionActivity.this)) {
                     Config.OPERATION_MODE = Config.MODE_ONLINE;
                     new Handler().postDelayed(
-                            new Runnable(){
+                            new Runnable() {
                                 @Override
                                 public void run() {
                                     fetchCitiesAndCategories();
                                 }
                             }, 100);
                 }
-                if(tab.getPosition() == 0){
+                if (tab.getPosition() == 0) {
                     Config.OPERATION_MODE = Config.MODE_OFFLINE;
                 }
             }
@@ -108,13 +145,13 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
-                Log.e(TAG,"here unselected " + String.valueOf(tab.getPosition()));
+                Log.e(TAG, "here unselected " + String.valueOf(tab.getPosition()));
 
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                Log.e(TAG,"here reselected " + String.valueOf(tab.getPosition()));
+                Log.e(TAG, "here reselected " + String.valueOf(tab.getPosition()));
             }
         });
 
@@ -122,25 +159,30 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!Config.CityIDHolder.isEmpty() && !Config.CategoryIDHolder.isEmpty()) {
+                if (!Config.CityIDHolder.isEmpty() && !Config.CategoryIDHolder.isEmpty()) {
                     Intent intent = new Intent(CityCategorySelectionActivity.this, AreaSelectionActivity.class);
                     startActivity(intent);
-                }
-                else {
-                    Toast.makeText(CityCategorySelectionActivity.this, getResources().getString(R.string.toast_select_city_category),Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(CityCategorySelectionActivity.this, getResources().getString(R.string.toast_select_city_category), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(tabLayout.getSelectedTabPosition() == 0){
+        if (tabLayout.getSelectedTabPosition() == 0) {
             Config.OPERATION_MODE = Config.MODE_OFFLINE;
-        }
-        else {
+        } else {
             Config.OPERATION_MODE = Config.MODE_ONLINE;
         }
     }
@@ -150,6 +192,135 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
         adapter.addFragment(new OfflineFragment(), getResources().getString(R.string.tab_text_offline));
         adapter.addFragment(new OnlineFragment(), getResources().getString(R.string.tab_text_online));
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Log.e(TAG, "googleapiclient connected");
+
+        createLocationRequest();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
+                        builder.build());
+
+        builder.setAlwaysShow(true);
+        Log.e(TAG, "heer");
+
+        result.setResultCallback(this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+                    break;
+                case Activity.RESULT_CANCELED:
+                    Toast.makeText(this,getResources().getString(R.string.toast_no_gps),Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onResult(@NonNull LocationSettingsResult result) {
+
+        final Status status = result.getStatus();
+        final LocationSettingsStates locationSettingsStates = result.getLocationSettingsStates();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+
+                try {
+                    status.startResolutionForResult(
+                            CityCategorySelectionActivity.this,
+                            REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+
+                break;
+        }
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        if(mGoogleApiClient.isConnected()) {
+            mCurrentLocation = location;
+            Log.i(TAG, mCurrentLocation.toString());
+            Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+            try {
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (addresses != null || addresses.size() > 0) {
+                    currentArea = addresses.get(0).getAddressLine(1);
+                    Log.i(TAG,currentArea);
+                    Intent intent = new Intent(this,EntitySelectionActivity.class);
+                    intent.putExtra(Config.KEY_FOR_NEARBY_ENTITIES,"Bajaj Nagar");
+                    startActivity(intent);
+                } else {
+                    Log.e(TAG, "Could not fetch data after googleApiClient connected");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -197,6 +368,9 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
                 else
                     ((PocketWikiApplication) getApplicationContext()).setLocale("en");
                 recreate();
+                return true;
+            case R.id.action_fetch_location:
+                mGoogleApiClient.connect();
                 return true;
             case android.R.id.home:
                 // app icon in action bar clicked; go home
@@ -280,4 +454,36 @@ public class CityCategorySelectionActivity extends AppCompatActivity {
         apiCaller.getCall(Config.URL_GET_CITIES,callback,this);
         apiCaller.getCall(Config.URL_GET_CATEGORIES,callback,this);
     }
+
+    /*private void fetchNearbyEntities(String currentArea){
+
+
+        Callback<String> callback = new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                Log.i(TAG,"response is " + s);
+                try {
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(CityCategorySelectionActivity.this,getResources().getString(R.string.toast_json_exception),Toast.LENGTH_SHORT).show();
+                }
+                Utils.dismissDialog(CityCategorySelectionActivity.this,dialog);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Log.e(TAG,"Something went wrong");
+                Log.e(TAG,retrofitError.getMessage() + " hmm");
+                Toast.makeText(CityCategorySelectionActivity.this,getResources().getString(R.string.toast_callback_failure),Toast.LENGTH_SHORT).show();
+                Utils.dismissDialog(CityCategorySelectionActivity.this,dialog);
+            }
+        };
+
+        APICaller apiCaller = new APICaller();
+        dialog = Utils.showDialog(this,getResources().getString(R.string.dialog_fetch_data));
+        apiCaller.getCall(Config.URL_GET_NEARBY_ENTITIES(currentArea),
+                callback,this);
+    }*/
 }

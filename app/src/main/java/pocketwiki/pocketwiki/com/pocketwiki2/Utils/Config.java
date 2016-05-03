@@ -19,7 +19,8 @@ public class Config {
     public static final int MODE_OFFLINE = 0;
     public static final int MODE_ONLINE = 1;
     public static final long DEFAULT_LANGUAGE_ID = 1;
-    public static String KEY_ACTIVITY_RECREATED = "activity_recreated";
+    public static final String KEY_ACTIVITY_RECREATED = "activity_recreated";
+    public static final String KEY_FOR_NEARBY_ENTITIES = "for_nearby_entities";
     public static final String LOCAL_DB_NAME = "PocketWiki-db";
     public static final String DOWNLOAD_FOLDER_NAME = "PocketWiki";
 
@@ -37,6 +38,8 @@ public class Config {
     public static final String KEY_AREAS = "areas";
     public static final String KEY_CITY_NAME = "city_name";
     public static final String KEY_AREA_NAME = "area_name";
+    public static final String KEY_AREA = "area";
+    public static final String KEY_CITY = "city";
     public static final String KEY_SUB_ENTITY_NAME = "name";
     public static final String KEY_ENTITY_NAME = "entity";
     public static final String KEY_CATEGORY_NAME = "category_name";
@@ -134,6 +137,15 @@ public class Config {
         retStr = retStr + "/contents?";
         retStr = retStr + "language_id=" + String.valueOf(languageId);
         retStr = retStr + "&entity_id=" + String.valueOf(entityId);
+        Log.i("config",retStr);
+        return retStr;
+    }
+    public static String URL_GET_NEARBY_ENTITIES(String area){
+
+        String retStr = URL_VERSION;
+        retStr = retStr + "/entities/search?query=";
+        retStr = retStr.concat(area);
+        retStr = retStr.replace(" ","%20");
         Log.i("config",retStr);
         return retStr;
     }

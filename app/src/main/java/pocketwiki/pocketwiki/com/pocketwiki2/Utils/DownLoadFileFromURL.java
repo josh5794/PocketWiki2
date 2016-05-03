@@ -65,7 +65,7 @@ public class DownLoadFileFromURL extends AsyncTask<String, String, String> {
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
             }
             else {
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
             }
             request.setDestinationUri(downloadLocation);
             request.setAllowedNetworkTypes(

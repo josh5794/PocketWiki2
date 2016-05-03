@@ -2,7 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/action_change_language"
-        android:title="Change Language"
+        android:title="@string/menu_change_language"
+        android:showAsAction="always"/>
+
+    <item android:id="@+id/action_fetch_location"
+        android:title="@string/menu_entities_around"
         android:showAsAction="always"/>
 
 </menu>

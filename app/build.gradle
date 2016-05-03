@@ -30,4 +30,5 @@ dependencies {
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     compile 'com.squareup.okhttp:okhttp-tests:1.5.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
 }

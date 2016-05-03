@@ -8,6 +8,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class AreaSelectionActivity extends AppCompatActivity {
     ProgressDialog dialog;
     ListView listView;
     public String TAG = getClass().getSimpleName();
+    private AreaListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +59,7 @@ public class AreaSelectionActivity extends AppCompatActivity {
             fetchAreasOnline();
         }
         else {
-            setupAreaList();
+            setupAreaList(false);
         }
 
         btnApply = (FloatingActionButton) findViewById(R.id.areaselectionactivity_btn_apply);
@@ -70,10 +74,10 @@ public class AreaSelectionActivity extends AppCompatActivity {
 
     }
 
-    private void setupAreaList(){
+    private void setupAreaList(boolean checkboxDerired){
         areas = fetchAreas();
         Log.i(TAG, "Area count is " + String.valueOf(areas.size()));
-        AreaListAdapter listAdapter = new AreaListAdapter(areas, AreaSelectionActivity.this, true);
+        listAdapter = new AreaListAdapter(areas, AreaSelectionActivity.this, checkboxDerired);
         listView.setAdapter(listAdapter);
     }
 
@@ -99,7 +103,7 @@ public class AreaSelectionActivity extends AppCompatActivity {
                         //area.setEntityCount(jsonArray.getJSONObject(i).getInt(Config.KEY_ENTITY_COUNT));
                         areaDao.insertOrReplace(area);
                     }
-                    setupAreaList();
+                    setupAreaList(false);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -152,4 +156,21 @@ public class AreaSelectionActivity extends AppCompatActivity {
         return areas;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_select_area:
+                setupAreaList(true);        //true means check all boxes
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_area_selection, menu);
+        return true;
+    }
 }

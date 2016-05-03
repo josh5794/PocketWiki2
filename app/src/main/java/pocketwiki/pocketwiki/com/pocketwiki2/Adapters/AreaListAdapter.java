@@ -59,13 +59,16 @@ public class AreaListAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.tvItemName = (TextView) convertView.findViewById(R.id.listitem_general_tv_heading);
             holder.tvEntityCount = (TextView) convertView.findViewById(R.id.listitem_general_tv_subheading);
-            if(mCheckBoxDesired){
+            /*if(mCheckBoxDesired){
                 convertView.findViewById(R.id.listitem_general_rlt_cb).setVisibility(View.VISIBLE);
                 holder.cbTick = (CheckBox) convertView.findViewById(R.id.listitem_general_cb);
             }
             else {
                 convertView.findViewById(R.id.listitem_general_rlt_cb).setVisibility(View.GONE);
-            }
+            }*/
+            convertView.findViewById(R.id.listitem_general_rlt_cb).setVisibility(View.VISIBLE);
+            holder.cbTick = (CheckBox) convertView.findViewById(R.id.listitem_general_cb);
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -75,7 +78,8 @@ public class AreaListAdapter extends BaseAdapter {
         holder.tvEntityCount.setText(mDataSet.get(position).getCityName());
 
         if(mCheckBoxDesired){
-
+            holder.cbTick.setChecked(true);
+            Config.AreaIDHolder.add(mDataSet.get(position).getAreaId());
         }
 
         holder.cbTick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
