@@ -29,10 +29,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.List;
 
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.AudioPaths;
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.AudioPathsDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Content;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.ContentDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.DaoSession;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.EntityDao;
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.LanguageDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.SubEntity;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.SubEntityDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.PocketWikiApplication;
@@ -53,9 +56,9 @@ public class EntityDetailsActivity extends AppCompatActivity {
     private TextView tvContent, tvPlay, tvDownload;
     ProgressDialog dialog;
     private Content content;
-    private String audioURL;
     private MediaPlayer mediaPlayer;
     private RelativeLayout btnDownload, btnAudio;
+    private JSONArray audioPaths;
     public String TAG = getClass().getSimpleName();
 
     @Override
@@ -82,6 +85,8 @@ public class EntityDetailsActivity extends AppCompatActivity {
         loadImage();
 
         fetchContent();
+
+        Log.e(TAG,"ids: " + Config.CityIDHolder.toString() + " " + Config.CategoryIDHolder.toString());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -114,8 +119,8 @@ public class EntityDetailsActivity extends AppCompatActivity {
                                     subEntity.setSubEntityId(jsonArray.getJSONObject(i).getLong(Config.KEY_ID));
                                     subEntity.setImageURLThumbOnline(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB));
                                     subEntity.setImageURLLargeOnline(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE));
-                                    subEntity.setImageURLThumb(Utils.saveImage(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB),EntityDetailsActivity.this));
-                                    subEntity.setImageURLLarge(Utils.saveImage(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE),EntityDetailsActivity.this));
+                                    subEntity.setImageURLThumb(Utils.saveImage(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB),EntityDetailsActivity.this,subEntity.getName() + Config.TAG_THUMB_IMAGE));
+                                    subEntity.setImageURLLarge(Utils.saveImage(jsonArray.getJSONObject(i).getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE),EntityDetailsActivity.this,subEntity.getName() + Config.TAG_BIG_IMAGE));
                                     subEntityDao.insertOrReplace(subEntity);
                                     subEntityJsonArray.put(subEntity.getSubEntityId());
                                 }
@@ -229,13 +234,20 @@ public class EntityDetailsActivity extends AppCompatActivity {
     private void saveInfo(){
         DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
         ContentDao contentDao = daoSession.getContentDao();
-        String audioFileName = String.valueOf(System.currentTimeMillis());
-        new DownLoadFileFromURL(this,Config.DATA_TYPE_AUDIO).execute(audioURL,
-                audioFileName);
-        String filepath = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS + "/" + Config.DOWNLOAD_FOLDER_NAME), audioFileName)).toString();
-        content.setAudioPath(filepath);
-        Log.e(TAG,content.toString());
+        AudioPathsDao audioPathsDao = daoSession.getAudioPathsDao();
+        try {
+            for(int i=0; i<audioPaths.length(); i++){
+                String audioFileName = String.valueOf(System.currentTimeMillis());
+                new DownLoadFileFromURL(this,Config.DATA_TYPE_AUDIO).execute(audioPaths.getJSONObject(i).getString(Config.KEY_URL),
+                        audioFileName);
+                String filepath = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS + "/" + Config.DOWNLOAD_FOLDER_NAME), audioFileName)).toString();
+                audioPathsDao.insert(new AudioPaths(System.currentTimeMillis(),content.getContentId(),audioPaths.getJSONObject(i).getLong(Config.KEY_ID),filepath));
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         contentDao.insertOrReplace(content);
 
     }
@@ -262,13 +274,37 @@ public class EntityDetailsActivity extends AppCompatActivity {
     }
 
     private void playAudio(){
+        DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
+        LanguageDao languageDao = daoSession.getLanguageDao();
+        AudioPathsDao audioPathsDao = daoSession.getAudioPathsDao();
+        long langID = -1;
+        if(getResources().getConfiguration().locale.getLanguage().equals("en")){
+            langID = languageDao.queryBuilder().where(LanguageDao.Properties.Name.eq("en"))
+                    .list().get(0).getLanguageId();
+        }
+        else if(getResources().getConfiguration().locale.getLanguage().equals("hi")){
+            langID = languageDao.queryBuilder().where(LanguageDao.Properties.Name.eq("hi"))
+                    .list().get(0).getLanguageId();
+        }
+        String uri = "-1";
         try {
-            String uri = audioURL;
+            if(Config.OPERATION_MODE == Config.MODE_ONLINE){
+                for(int i=0;i<audioPaths.length(); i++){
+                    if(audioPaths.getJSONObject(i).getInt(Config.KEY_ID) == langID){
+                        uri = audioPaths.getJSONObject(i).getString(Config.KEY_URL);
+                    }
+                }
+            }
+            else if(Config.OPERATION_MODE == Config.MODE_OFFLINE){
+                    uri = audioPathsDao.queryBuilder().where(
+                            AudioPathsDao.Properties.ContentId.eq(content.getContentId()),
+                            AudioPathsDao.Properties.LanguageId.eq(langID)).
+                            list().get(0).getAudioPath();
+            }
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            if(Config.OPERATION_MODE == Config.MODE_OFFLINE){
-                uri = content.getAudioPath();
-            }
+
+            Log.i(TAG,"uri: " + uri);
             mediaPlayer.setDataSource(uri);
             mediaPlayer.prepare();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -311,7 +347,7 @@ public class EntityDetailsActivity extends AppCompatActivity {
                         content.setDescription(jsonObject.getString(Config.KEY_DESCRIPTION));
                         if(!jsonObject.isNull(Config.KEY_SUB_ENTITY_ID))
                             content.setSubEntityId(jsonObject.getLong(Config.KEY_SUB_ENTITY_ID));
-                        audioURL = jsonObject.getString(Config.KEY_AUDIO);
+                        audioPaths = new JSONObject(s).getJSONObject(Config.KEY_DATA).getJSONArray(Config.KEY_AUDIO);
                         displayContent(content.getDescription());
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -334,10 +370,10 @@ public class EntityDetailsActivity extends AppCompatActivity {
             Long entityId = getIntent().getLongExtra(Config.KEY_ENTITY_ID,0);
             if(getIntent().hasExtra(Config.KEY_SUB_ENTITY_ID)){
                 Long subEntityId = getIntent().getLongExtra(Config.KEY_SUB_ENTITY_ID,0);
-                apiCaller.getCall(Config.URL_GET_CONTENT(Config.DEFAULT_LANGUAGE_ID,entityId,subEntityId),callback,this);
+                apiCaller.getCall(Config.URL_GET_CONTENT(entityId,subEntityId),callback,this);
             }
             else {
-                apiCaller.getCall(Config.URL_GET_CONTENT(Config.DEFAULT_LANGUAGE_ID, entityId), callback, this);
+                apiCaller.getCall(Config.URL_GET_CONTENT(entityId), callback, this);
             }
         }
         else {

@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,6 +56,11 @@ public class AreaSelectionActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.areaselectionactivity_lv);
 
+        if(getIntent().hasExtra(Config.KEY_OPERATION_MODE)){
+            Config.OPERATION_MODE = getIntent().getIntExtra(Config.KEY_OPERATION_MODE,0);
+            Log.e(TAG,"here " + String .valueOf(Config.OPERATION_MODE));
+        }
+
         if(Config.OPERATION_MODE == Config.MODE_ONLINE) {
             fetchAreasOnline();
         }
@@ -71,6 +77,8 @@ public class AreaSelectionActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Log.e(TAG,"ids: " + Config.CityIDHolder.toString() + " " + Config.CategoryIDHolder.toString());
 
     }
 
@@ -162,9 +170,20 @@ public class AreaSelectionActivity extends AppCompatActivity {
             case R.id.action_select_area:
                 setupAreaList(true);        //true means check all boxes
                 return true;
+            case android.R.id.home:
+                Config.AreaIDHolder.clear();
+                Config.CityIDHolder.clear();
+                Config.CategoryIDHolder.clear();
+                this.finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG,"onBackPressed");
     }
 
     @Override

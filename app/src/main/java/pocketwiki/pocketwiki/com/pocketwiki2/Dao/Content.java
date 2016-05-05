@@ -1,5 +1,6 @@
 package pocketwiki.pocketwiki.com.pocketwiki2.Dao;
 
+import java.util.List;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -14,7 +15,6 @@ public class Content {
     private String updatedAt;
     private String description;
     private Long subEntityId;
-    private String audioPath;
     private Long languageId;
     private Long areaEntitiesId;
 
@@ -30,6 +30,7 @@ public class Content {
     private AreaEntities areaEntities;
     private Long areaEntities__resolvedKey;
 
+    private List<AudioPaths> audioPathsList;
 
     public Content() {
     }
@@ -38,13 +39,12 @@ public class Content {
         this.contentId = contentId;
     }
 
-    public Content(Long contentId, String createdAt, String updatedAt, String description, Long subEntityId, String audioPath, Long languageId, Long areaEntitiesId) {
+    public Content(Long contentId, String createdAt, String updatedAt, String description, Long subEntityId, Long languageId, Long areaEntitiesId) {
         this.contentId = contentId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.description = description;
         this.subEntityId = subEntityId;
-        this.audioPath = audioPath;
         this.languageId = languageId;
         this.areaEntitiesId = areaEntitiesId;
     }
@@ -93,14 +93,6 @@ public class Content {
 
     public void setSubEntityId(Long subEntityId) {
         this.subEntityId = subEntityId;
-    }
-
-    public String getAudioPath() {
-        return audioPath;
-    }
-
-    public void setAudioPath(String audioPath) {
-        this.audioPath = audioPath;
     }
 
     public Long getLanguageId() {
@@ -167,6 +159,28 @@ public class Content {
             areaEntitiesId = areaEntities == null ? null : areaEntities.getAreaEntitiesId();
             areaEntities__resolvedKey = areaEntitiesId;
         }
+    }
+
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    public List<AudioPaths> getAudioPathsList() {
+        if (audioPathsList == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            AudioPathsDao targetDao = daoSession.getAudioPathsDao();
+            List<AudioPaths> audioPathsListNew = targetDao._queryContent_AudioPathsList(contentId);
+            synchronized (this) {
+                if(audioPathsList == null) {
+                    audioPathsList = audioPathsListNew;
+                }
+            }
+        }
+        return audioPathsList;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    public synchronized void resetAudioPathsList() {
+        audioPathsList = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

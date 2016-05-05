@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import java.util.HashSet;
 import java.util.List;
 
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.City;
@@ -90,6 +91,10 @@ public class CityListAdapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     Config.CityIDHolder.add(mDataSet.get(position).getCityId());
+                    HashSet hs = new HashSet();
+                    hs.addAll(Config.CityIDHolder);
+                    Config.CityIDHolder.clear();
+                    Config.CityIDHolder.addAll(hs);
                 }
                 else {
                     Config.CityIDHolder.remove(mDataSet.get(position).getCityId());

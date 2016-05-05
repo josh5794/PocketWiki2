@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,12 +68,7 @@ public class EntitySelectionActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(getResources().getString(R.string.title_activity_entity_selection));
         }
 
-        /*ArrayList<Entity> itemList = new ArrayList<>();
-        itemList.add(new Entity((long) 35,"","","itemName1",""));
-        itemList.add(new Entity((long) 36,"","","itemName1",""));
-        itemList.add(new Entity((long) 37,"","","itemName1",""));
-        itemList.add(new Entity((long) 38,"","","itemName1",""));
-*/
+        Log.e(TAG,"ids: " + Config.CityIDHolder.toString() + " " + Config.CategoryIDHolder.toString());
 
         listView = (ListView) findViewById(R.id.entityselectionactivity_lv);
 
@@ -347,8 +343,8 @@ public class EntitySelectionActivity extends AppCompatActivity {
             entity.setUpdatedAt(jsonObject.getString(Config.KEY_UPDATED_AT));
             entity.setImageURLThumbOnline(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB));
             entity.setImageURLLargeOnline(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE));
-            entity.setImageURLThumb(Utils.saveImage(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB),EntitySelectionActivity.this));
-            entity.setImageURLLarge(Utils.saveImage(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE),EntitySelectionActivity.this));
+            entity.setImageURLThumb(Utils.saveImage(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_THUMB),EntitySelectionActivity.this,entity.getName() + Config.TAG_THUMB_IMAGE));
+            entity.setImageURLLarge(Utils.saveImage(jsonObject.getJSONObject(Config.KEY_IMAGES).getString(Config.KEY_IMAGES_LARGE),EntitySelectionActivity.this,entity.getName() + Config.TAG_BIG_IMAGE));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -362,10 +358,8 @@ public class EntitySelectionActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_download_all:
-                downloadAllEntities();
                 return true;
             case android.R.id.home:
-                // app icon in action bar clicked; go home
                 this.finish();
                 return true;
             default:
@@ -374,7 +368,7 @@ public class EntitySelectionActivity extends AppCompatActivity {
     }
 
 
-    private void downloadAllEntities(){
+    /*private void downloadAllEntities(){
         DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
         final ContentDao contentDao = daoSession.getContentDao();
         Callback <String> callback = new Callback<String>() {
@@ -429,7 +423,13 @@ public class EntitySelectionActivity extends AppCompatActivity {
             apiCaller.getCall(Config.URL_GET_CONTENT(Config.DEFAULT_LANGUAGE_ID, entityId), callback, this);
         }
     }
+*/
 
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG,"onBackPressed");
+    }
 }
 
 

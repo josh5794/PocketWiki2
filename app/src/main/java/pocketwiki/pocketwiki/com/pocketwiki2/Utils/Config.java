@@ -18,11 +18,15 @@ public class Config {
     public static int OPERATION_MODE = -1;
     public static final int MODE_OFFLINE = 0;
     public static final int MODE_ONLINE = 1;
-    public static final long DEFAULT_LANGUAGE_ID = 1;
+    public static final long DEFAULT_LANGUAGE_ID = 1;      //English
     public static final String KEY_ACTIVITY_RECREATED = "activity_recreated";
+    public static final String KEY_OPERATION_MODE = "operation_mode";
     public static final String KEY_FOR_NEARBY_ENTITIES = "for_nearby_entities";
     public static final String LOCAL_DB_NAME = "PocketWiki-db";
     public static final String DOWNLOAD_FOLDER_NAME = "PocketWiki";
+    public static final String FLAG_MOVE_TO_AREA_SELECTION = "move_to_area_selection_activity";
+    public static final String TAG_BIG_IMAGE = "big_image";
+    public static final String TAG_THUMB_IMAGE = "thumb_image";
 
     public static final String KEY_AREA_ENTITY_ID = "area_entity_id";
     public static final String KEY_ENTITY_ID = "entity_id";
@@ -59,7 +63,9 @@ public class Config {
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_LANGUAGE = "language";
     public static final String KEY_AUDIO = "audio";
+    public static final String KEY_AUDIO_HINDI = "audio_hindi";
     public static final String KEY_IMAGES = "images";
+    public static final String KEY_URL = "url";
     public static final String KEY_IMAGES_THUMB = "thumb";
     public static final String KEY_IMAGES_LARGE = "large";
 
@@ -123,19 +129,17 @@ public class Config {
         return retStr;
 
     }
-    public static String URL_GET_CONTENT(Long languageId, Long entityId, Long subEntityId){
+    public static String URL_GET_CONTENT(Long entityId, Long subEntityId){
         String retStr = URL_VERSION;
         retStr = retStr + "/contents?";
-        retStr = retStr + "language_id=" + String.valueOf(languageId);
         retStr = retStr + "&entity_id=" + String.valueOf(entityId);
         retStr = retStr + "&sub_entity_id=" + String.valueOf(subEntityId);
         Log.i("config",retStr);
         return retStr;
     }
-    public static String URL_GET_CONTENT(Long languageId, Long entityId){
+    public static String URL_GET_CONTENT(Long entityId){
         String retStr = URL_VERSION;
         retStr = retStr + "/contents?";
-        retStr = retStr + "language_id=" + String.valueOf(languageId);
         retStr = retStr + "&entity_id=" + String.valueOf(entityId);
         Log.i("config",retStr);
         return retStr;

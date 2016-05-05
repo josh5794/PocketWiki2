@@ -158,16 +158,14 @@ public class Utils {
         apiCaller.getCall(Config.URL_GET_CATEGORIES,callback,context);
     }
 
-    public static String saveImage(String imageURL, Context context){
-        String imageFileName = String.valueOf(System.currentTimeMillis());
+    public static String saveImage(String imageURL, Context context, String imageFileName){
         new DownLoadFileFromURL(context,Config.DATA_TYPE_IMAGE).execute(imageURL,
-                imageFileName);
+                String.valueOf(imageFileName.hashCode()));
         String filepath = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS + "/" + Config.DOWNLOAD_FOLDER_NAME), imageFileName + ".png")).toString();
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        dir.mkdirs();
-        String path = Uri.fromFile(new File(dir + "/" + Config.DOWNLOAD_FOLDER_NAME, imageFileName + ".png")).toString();
-        return imageFileName;
+                Environment.DIRECTORY_DOWNLOADS + "/" + Config.DOWNLOAD_FOLDER_NAME), String.valueOf(imageFileName.hashCode()))).toString();
+
+        Log.i(TAG,imageFileName + " :: " + filepath);
+        return filepath;
     }
 
     public static String[] trimAlphabetArray(String[] alphabets, Context context, int code){
@@ -269,8 +267,10 @@ public class Utils {
             String fileName= URL;
             fileName = fileName.replace(':', '/');
             fileName = fileName.replace('/', '_');
-            String loadURL="file://"+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+Config.DOWNLOAD_FOLDER_NAME+"/"+fileName;
-            imageView.setImageBitmap(BitmapFactory.decodeFile(loadURL.substring(5)));
+            String loadURL="file://"+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+Config.DOWNLOAD_FOLDER_NAME+"/"+fileName + ".png";
+            Log.i(TAG,"jh " + URL);
+            URL = URL + ".png";
+            imageView.setImageBitmap(BitmapFactory.decodeFile(URL.substring(5)));
         }
         else {
             imageLoader.displayImage(URL,imageView,options);

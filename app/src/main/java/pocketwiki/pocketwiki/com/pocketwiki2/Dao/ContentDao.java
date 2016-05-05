@@ -31,9 +31,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property UpdatedAt = new Property(2, String.class, "updatedAt", false, "UPDATED_AT");
         public final static Property Description = new Property(3, String.class, "description", false, "DESCRIPTION");
         public final static Property SubEntityId = new Property(4, Long.class, "subEntityId", false, "SUB_ENTITY_ID");
-        public final static Property AudioPath = new Property(5, String.class, "audioPath", false, "AUDIO_PATH");
-        public final static Property LanguageId = new Property(6, Long.class, "languageId", false, "LANGUAGE_ID");
-        public final static Property AreaEntitiesId = new Property(7, Long.class, "areaEntitiesId", false, "AREA_ENTITIES_ID");
+        public final static Property LanguageId = new Property(5, Long.class, "languageId", false, "LANGUAGE_ID");
+        public final static Property AreaEntitiesId = new Property(6, Long.class, "areaEntitiesId", false, "AREA_ENTITIES_ID");
     };
 
     private DaoSession daoSession;
@@ -57,9 +56,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"UPDATED_AT\" TEXT," + // 2: updatedAt
                 "\"DESCRIPTION\" TEXT," + // 3: description
                 "\"SUB_ENTITY_ID\" INTEGER," + // 4: subEntityId
-                "\"AUDIO_PATH\" TEXT," + // 5: audioPath
-                "\"LANGUAGE_ID\" INTEGER," + // 6: languageId
-                "\"AREA_ENTITIES_ID\" INTEGER);"); // 7: areaEntitiesId
+                "\"LANGUAGE_ID\" INTEGER," + // 5: languageId
+                "\"AREA_ENTITIES_ID\" INTEGER);"); // 6: areaEntitiesId
     }
 
     /** Drops the underlying database table. */
@@ -98,19 +96,14 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindLong(5, subEntityId);
         }
  
-        String audioPath = entity.getAudioPath();
-        if (audioPath != null) {
-            stmt.bindString(6, audioPath);
-        }
- 
         Long languageId = entity.getLanguageId();
         if (languageId != null) {
-            stmt.bindLong(7, languageId);
+            stmt.bindLong(6, languageId);
         }
  
         Long areaEntitiesId = entity.getAreaEntitiesId();
         if (areaEntitiesId != null) {
-            stmt.bindLong(8, areaEntitiesId);
+            stmt.bindLong(7, areaEntitiesId);
         }
     }
 
@@ -135,9 +128,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // updatedAt
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // description
             cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // subEntityId
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // audioPath
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // languageId
-            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // areaEntitiesId
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // languageId
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6) // areaEntitiesId
         );
         return entity;
     }
@@ -150,9 +142,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setUpdatedAt(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDescription(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setSubEntityId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
-        entity.setAudioPath(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setLanguageId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setAreaEntitiesId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setLanguageId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setAreaEntitiesId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
      }
     
     /** @inheritdoc */

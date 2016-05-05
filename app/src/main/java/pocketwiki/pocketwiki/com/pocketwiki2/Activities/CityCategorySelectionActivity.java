@@ -53,8 +53,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Category;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CategoryDao;
@@ -103,7 +105,14 @@ public class CityCategorySelectionActivity extends AppCompatActivity implements 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        if (getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED) || Utils.isOnline(this)) {
+        dumpIntent(getIntent());
+        if(getIntent().hasExtra(Config.FLAG_MOVE_TO_AREA_SELECTION)){
+            Log.i(TAG,"hyt");
+            Intent intent = new Intent(CityCategorySelectionActivity.this,AreaSelectionActivity.class);
+            intent.putExtra(Config.KEY_OPERATION_MODE,getIntent().getIntExtra(Config.FLAG_MOVE_TO_AREA_SELECTION,0));
+            startActivity(intent);
+        }
+        else if (getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED) || Utils.isOnline(this)) {
             Config.OPERATION_MODE = Config.MODE_ONLINE;
             tabLayout.getTabAt(1).select();
             if(!getIntent().hasExtra(Config.KEY_ACTIVITY_RECREATED)){
@@ -160,7 +169,8 @@ public class CityCategorySelectionActivity extends AppCompatActivity implements 
             @Override
             public void onClick(View v) {
                 if (!Config.CityIDHolder.isEmpty() && !Config.CategoryIDHolder.isEmpty()) {
-                    Intent intent = new Intent(CityCategorySelectionActivity.this, AreaSelectionActivity.class);
+                    Intent intent = new Intent(CityCategorySelectionActivity.this, CityCategorySelectionActivity.class);
+                    intent.putExtra(Config.FLAG_MOVE_TO_AREA_SELECTION,Config.OPERATION_MODE);
                     startActivity(intent);
                 } else {
                     Toast.makeText(CityCategorySelectionActivity.this, getResources().getString(R.string.toast_select_city_category), Toast.LENGTH_SHORT).show();
@@ -174,6 +184,22 @@ public class CityCategorySelectionActivity extends AppCompatActivity implements 
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+        Log.e(TAG,"ids: " + Config.CityIDHolder.toString() + " " + Config.CategoryIDHolder.toString());
+    }
+
+    public void dumpIntent(Intent i){
+
+        Bundle bundle = i.getExtras();
+        if (bundle != null) {
+            Set<String> keys = bundle.keySet();
+            Iterator<String> it = keys.iterator();
+            Log.e(TAG,"Dumping Intent start");
+            while (it.hasNext()) {
+                String key = it.next();
+                Log.e(TAG,"[" + key + "=" + bundle.get(key)+"]");
+            }
+            Log.e(TAG,"Dumping Intent end");
         }
     }
 

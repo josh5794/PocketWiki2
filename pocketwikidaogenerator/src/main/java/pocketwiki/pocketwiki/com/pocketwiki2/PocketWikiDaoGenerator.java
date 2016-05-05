@@ -87,11 +87,18 @@ public class PocketWikiDaoGenerator {
         content.addStringProperty("updatedAt");
         content.addStringProperty("description");
         content.addLongProperty("subEntityId");
-        content.addStringProperty("audioPath");
+        //content.addStringProperty("audioPath");
         Property fkLanguageId = content.addLongProperty("languageId").getProperty();
         Property fkAreaEntitiesId = content.addLongProperty("areaEntitiesId").getProperty();
         content.addToOne(language,fkLanguageId);
         content.addToOne(areaEntities,fkAreaEntitiesId);
+
+        Entity audioPaths = schema.addEntity("AudioPaths");
+        Property audioPathId = audioPaths.addLongProperty("audioPathId").primaryKey().getProperty();
+        Property fkContentId = audioPaths.addLongProperty("contentId").getProperty();
+        audioPaths.addLongProperty("languageId");
+        audioPaths.addStringProperty("audioPath");
+        content.addToMany(audioPaths,fkContentId);
 
         new DaoGenerator().generateAll(schema, "../app/src/main/java");
 

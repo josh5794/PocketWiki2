@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import java.util.HashSet;
 import java.util.List;
 
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Area;
@@ -87,6 +88,10 @@ public class AreaListAdapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     Config.AreaIDHolder.add(mDataSet.get(position).getAreaId());
+                    HashSet hs = new HashSet();
+                    hs.addAll(Config.AreaIDHolder);
+                    Config.AreaIDHolder.clear();
+                    Config.AreaIDHolder.addAll(hs);
                 }
                 else {
                     Config.AreaIDHolder.remove(mDataSet.get(position).getAreaId());

@@ -62,9 +62,11 @@ public class DownLoadFileFromURL extends AsyncTask<String, String, String> {
                     .getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(f_url[0]));
             if(dataType == Config.DATA_TYPE_IMAGE){
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+                Log.i("dwn","imgurl " + downloadLocation.toString());
+                request.setVisibleInDownloadsUi(false);
             }
             else {
+                request.setVisibleInDownloadsUi(true);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
             }
             request.setDestinationUri(downloadLocation);
@@ -74,7 +76,9 @@ public class DownLoadFileFromURL extends AsyncTask<String, String, String> {
             request.setAllowedOverRoaming(false);
             request.setDescription("Downloading via PocketWiki..");
             request.setTitle(f_url[1]);
-            mdDownloadManager.enqueue(request);
+            if(!new File(dir + "/" + Config.DOWNLOAD_FOLDER_NAME, f_url[1] + ".png").exists()){
+                mdDownloadManager.enqueue(request);
+            }
 
         } catch (Exception e) {
             Log.e("Error: ", e.getMessage());

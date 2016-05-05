@@ -15,6 +15,8 @@ import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CategoryDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.City;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.CityDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.DaoSession;
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Language;
+import pocketwiki.pocketwiki.com.pocketwiki2.Dao.LanguageDao;
 import pocketwiki.pocketwiki.com.pocketwiki2.PocketWikiApplication;
 import pocketwiki.pocketwiki.com.pocketwiki2.Utils.Config;
 import pocketwiki.pocketwiki.com.pocketwiki2.R;
@@ -33,6 +35,11 @@ public class SplashActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.color_primary_dark));
         }
+
+        DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
+        LanguageDao languageDao = daoSession.getLanguageDao();
+        languageDao.insertOrReplace(new Language((long)1,String.valueOf(System.currentTimeMillis()),String.valueOf(System.currentTimeMillis()),"en",true));
+        languageDao.insertOrReplace(new Language((long)2,String.valueOf(System.currentTimeMillis()),String.valueOf(System.currentTimeMillis()),"hi",true));
 
         /*DaoSession daoSession = ((PocketWikiApplication) getApplicationContext()).getDaoSession();
         CityDao cityDao = daoSession.getCityDao();

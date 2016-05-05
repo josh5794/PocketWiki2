@@ -9,7 +9,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import pocketwiki.pocketwiki.com.pocketwiki2.Dao.Category;
 import pocketwiki.pocketwiki.com.pocketwiki2.R;
@@ -91,6 +94,10 @@ public class CategoryListAdapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     Config.CategoryIDHolder.add(mDataSet.get(position).getCategoryId());
+                    HashSet hs = new HashSet();
+                    hs.addAll(Config.CategoryIDHolder);
+                    Config.CategoryIDHolder.clear();
+                    Config.CategoryIDHolder.addAll(hs);
                 }
                 else {
                     Config.CategoryIDHolder.remove(mDataSet.get(position).getCategoryId());

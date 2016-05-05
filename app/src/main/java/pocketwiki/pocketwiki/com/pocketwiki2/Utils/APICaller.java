@@ -8,6 +8,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -29,10 +30,14 @@ public class APICaller {
 
     public APICaller() {
 
+        final OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
+        okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
+
         restAdapter = new RestAdapter.Builder().
                 setServer(Config.URL_ROOT).
                 setConverter(new CustomJsonConverter()).
-                setClient(new OkClient(new OkHttpClient())).
+                setClient(new OkClient(okHttpClient)).
                 build();
         apiList = restAdapter.create(APIList.class);
     }
